@@ -56,7 +56,7 @@ cdef extern from "pixel_dtb.h":
         void EnableColumn(int) except +
         void ArmPixel(int, int) except +
         void DisarmPixel(int, int) except +
-        int8_t Daq_Read_Decoded(vector[uint16_t] &, vector[uint16_t] &, vector[uint32_t] &) 
+        int8_t Daq_Read_Decoded(vector[uint16_t] &, vector[uint16_t] &, vector[uint32_t] &, vector[uint32_t] &) 
         int8_t CalibrateDacDacScan(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, vector[int16_t] &, vector[int32_t] &) 
         int8_t CalibrateDacScan(int16_t, int16_t, int16_t, int16_t, int16_t, int16_t, vector[int16_t] &, vector[int32_t] &) 
         int16_t CalibrateMap(int16_t, vector[int16_t] &, vector[int32_t] &, vector[uint32_t] &) 
@@ -345,7 +345,7 @@ cdef class PyDTB:
         return_value = self.thisptr.CalibrateMap_Par(n_triggers, n_hits, ph_sum, adr, rocs)
         return self.decoding(n_hits, ph_sum, adr)
 
-    def decoding(self, n_hits, ph, addr, Vcal_conversion = False):
+    def decoding(self, n_hits, ph, addr, event, Vcal_conversion = False):
         s = self.dut.get_roc_shape()
         hits = []
         phs = []
@@ -357,6 +357,8 @@ cdef class PyDTB:
             hits.append(numpy.zeros(s))
             phs.append(numpy.zeros(s))
         for i in xrange(len(addr)):
+            event_number = event[i]
+            self.logger.debug('event number: %i' %event_number)
             address = addr[i]
             row = address & 0xff
             col = (address >> 8) & 0xff
@@ -390,8 +392,9 @@ cdef class PyDTB:
         cdef vector[uint16_t] _n_hits
         cdef vector[uint16_t] _ph
         cdef vector[uint32_t] _addr
-        return_value = self.thisptr.Daq_Read_Decoded(_n_hits, _ph, _addr)
-        nh, av_ph, ph_histogram, ph_cal_histogram = self.decoding(_n_hits, _ph, _addr, Vcal_conversion)
+        cdef vector[uint32_t] _event
+        return_value = self.thisptr.Daq_Read_Decoded(_n_hits, _ph, _addr, _event)
+        nh, av_ph, ph_histogram, ph_cal_histogram = self.decoding(_n_hits, _ph, _addr, _event, Vcal_conversion)
         return nh, av_ph, ph_histogram, ph_cal_histogram, numpy.array(_n_hits), numpy.array(_ph), numpy.array(_addr)
 
     def dac_dac(self, n_triggers, col, row, dac1, dacRange1, dac2, dacRange2, num_hits, ph):

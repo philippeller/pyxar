@@ -85,6 +85,7 @@ class Testboard(dtb.PyDTB):
         tct_wbc = int(config.get('Testboard','tct_wbc'))
         resr_delay = int(config.get('Testboard','pg_resr'))
         trg_delay = int(config.get('Testboard','pg_trg'))
+        ttk = 32
         #Module
         if self.dut.n_tbms > 0:
             self.pg_setcmd(0, self.PG_RESR + resr_delay)
@@ -96,10 +97,12 @@ class Testboard(dtb.PyDTB):
             self.pg_setcmd(6, self.PG_TRG  )
         #Single roc
         else:
-            self.pg_setcmd(0, self.PG_RESR + resr_delay);
-            self.pg_setcmd(1, self.PG_CAL  + cal_delay + tct_wbc)
-            self.pg_setcmd(2, self.PG_TRG  + trg_delay)
-            self.pg_setcmd(3, self.PG_TOK);
+            #self.pg_setcmd(0, self.PG_RESR + resr_delay);
+            self.pg_setcmd(0, self.PG_CAL  + cal_delay + tct_wbc)
+            self.pg_setcmd(1, self.PG_TRG  + trg_delay)
+            self.pg_setcmd(2, self.PG_TOK + ttk);
+            self.pg_setcmd(3, self.PG_TRG  + trg_delay)
+            self.pg_setcmd(4, self.PG_TOK + ttk);
         self.m_delay(200)
 
     def init_deser(self):

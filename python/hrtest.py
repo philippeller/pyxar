@@ -25,6 +25,7 @@ class HRTest(test.Test):
         self.start_data = time.time()
         self.length=0
         self.logger.info('Start data taking')
+        self.tb.arm_pixel(5,5)
         for measurement_time in range(1*self.data_taking_time):
             self.tb.pg_loop(self.period)
             self.tb.m_delay(1000)

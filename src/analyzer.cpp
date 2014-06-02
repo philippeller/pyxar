@@ -63,7 +63,7 @@ void DecodePixel(unsigned int raw, int16_t &n, int16_t &ph, int16_t &col, int16_
 	//printf("   Pixel [%05o] %2i/%2i: %3u", raw, col, row, ph);
 }
 
-int8_t Decode(const std::vector<uint16_t> &data, std::vector<uint16_t> &n, std::vector<uint16_t> &ph, std::vector<uint32_t> &adr, uint8_t channel, bool has_tbm)
+int8_t Decode(const std::vector<uint16_t> &data, std::vector<uint16_t> &n, std::vector<uint16_t> &ph, std::vector<uint32_t> &adr, std::vector<uint32_t> &event, uint8_t channel, bool has_tbm)
 { 
 
     uint32_t words_remaining = 0;
@@ -121,11 +121,13 @@ int8_t Decode(const std::vector<uint16_t> &data, std::vector<uint16_t> &n, std::
   }
     //Single ROC
     else {
+        uint32_t ev_count = 0;
 	    while (!(pos >= int(data.size()))) {
         // check header
 	    if ((data[pos] & 0x8ffc) != 0x87f8)
 		    return -2; // wrong header
 	    int hdr = data[pos++] & 0xfff;
+        ev_count++;
 	    // read pixels while not data end or trailer
 	    while (!(pos >= int(data.size()) || (data[pos] & 0x8000))) {
         // store 24 bits in raw
@@ -141,6 +143,7 @@ int8_t Decode(const std::vector<uint16_t> &data, std::vector<uint16_t> &n, std::
         address = (address << 8) + col;
         address = (address << 8) + row;
         adr.push_back(address);
+        event.push_back(ev_count);
 	    }
         }
     }

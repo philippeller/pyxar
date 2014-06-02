@@ -206,7 +206,7 @@ int8_t CTestboard::Daq_Read2(vector<uint16_t> &data, uint16_t daq_read_size_2, u
 	return 1;
 }
 
-int8_t CTestboard::Daq_Read_Decoded(vector<uint16_t> &nReadouts, vector<uint16_t> &PHsum, vector<uint32_t> &adress) {
+int8_t CTestboard::Daq_Read_Decoded(vector<uint16_t> &nReadouts, vector<uint16_t> &PHsum, vector<uint32_t> &adress, vector<uint32_t> &event) {
     uint16_t daq_read_size = 5000;
 	int8_t ok = -1;
 	vector<uint16_t> data0;
@@ -218,8 +218,8 @@ int8_t CTestboard::Daq_Read_Decoded(vector<uint16_t> &nReadouts, vector<uint16_t
     avail_size = 10000000;
 	Daq_Read2(data1, daq_read_size, avail_size, 1);
 	//decode readouts
-	ok = Decode(data0, nReadouts, PHsum, adress, 0, TBM_Present());
-	ok = Decode(data1, nReadouts, PHsum, adress, 1, TBM_Present());
+	ok = Decode(data0, nReadouts, PHsum, adress, event, 0, TBM_Present());
+	ok = Decode(data1, nReadouts, PHsum, adress, event, 1, TBM_Present());
     return ok;
 }
 
@@ -247,6 +247,7 @@ int8_t CTestboard::CalibrateMap_Par(int16_t nTriggers, vector<int16_t> &nReadout
     uint8_t status;
 	vector<uint16_t> nhits, ph;
     vector<uint32_t> adr;
+    vector<uint32_t> event;
 	
     Daq_Deser400_Reset(3);
     Daq_Enable2(daq_avail_size);
@@ -261,11 +262,11 @@ int8_t CTestboard::CalibrateMap_Par(int16_t nTriggers, vector<int16_t> &nReadout
 		data.clear();
 		Daq_Read2(data, daq_read_size, avail_size, 0);
 		//decode readouts
-		ok = Decode(data, nhits, ph, adr, 0, TBM_Present());
+		ok = Decode(data, nhits, ph, adr, event, 0, TBM_Present());
         data.clear();
         avail_size = daq_avail_size;
 	    Daq_Read2(data, daq_read_size, avail_size, 1);
-        ok = Decode(data, nhits, ph, adr, 1, TBM_Present());
+        ok = Decode(data, nhits, ph, adr, event, 1, TBM_Present());
 
         //if (ok){
             nReadouts.insert( nReadouts.end(), nhits.begin(), nhits.end() );
@@ -290,6 +291,7 @@ int8_t CTestboard::CalibrateMap_Sof(int16_t nTriggers, vector<int16_t> &nReadout
     uint8_t status;
 	vector<uint16_t> nhits, ph;
     vector<uint32_t> adr;
+    vector<uint32_t> event;
 	
     Daq_Deser400_Reset(3);
     Daq_Enable2(daq_read_size);
@@ -316,11 +318,11 @@ int8_t CTestboard::CalibrateMap_Sof(int16_t nTriggers, vector<int16_t> &nReadout
         data.clear();
         Daq_Read2(data, daq_read_size, avail_size, 0);
         //decode readouts
-        ok = Decode(data, nhits, ph, adr, 0, TBM_Present());
+        ok = Decode(data, nhits, ph, adr, event, 0, TBM_Present());
         data.clear();
         avail_size = daq_avail_size;
         Daq_Read2(data, daq_read_size, avail_size, 1);
-        ok = Decode(data, nhits, ph, adr, 1, TBM_Present());
+        ok = Decode(data, nhits, ph, adr, event, 1, TBM_Present());
 
         nReadouts.insert( nReadouts.end(), nhits.begin(), nhits.end() );
         PHsum.insert( PHsum.end(), ph.begin(), ph.end() );
@@ -380,6 +382,7 @@ int8_t CTestboard::CalibrateReadouts(int16_t nTriggers, int16_t &nReadouts, int3
 
     vector<uint16_t> nhits, ph;
     vector<uint32_t> adr;
+    vector<uint32_t> event;
 	vector<uint16_t> data;
 	uDelay(5);
 
@@ -391,12 +394,12 @@ int8_t CTestboard::CalibrateReadouts(int16_t nTriggers, int16_t &nReadouts, int3
 
 	Daq_Read2(data, daq_read_size, avail_size, 0);
 
-    ok = Decode(data, nhits, ph, adr, 0, TBM_Present());
+    ok = Decode(data, nhits, ph, adr, event, 0, TBM_Present());
     data.clear();
     avail_size = 1000000;
 	Daq_Read2(data, daq_read_size, avail_size, 1);
 
-    ok = Decode(data, nhits, ph, adr, 1, TBM_Present());
+    ok = Decode(data, nhits, ph, adr, event, 1, TBM_Present());
 
 
 	for (int i = 0; i < adr.size(); i++)

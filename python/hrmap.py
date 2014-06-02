@@ -32,7 +32,13 @@ and clock stretch factor (ssc) are additional parameters.'''
             #self.tb.pg_setcmd(0, self.tb.PG_SYNC + self.tb.PG_TRG)
             #self.tb.pg_setcmd(1, self.tb.PG_TRG  + ttk)
         else:
-            self.tb.pg_setcmd(0, self.tb.PG_TRG  + ttk)
-            self.tb.pg_setcmd(1, self.tb.PG_TOK)
+            #self.tb.init_pg(self.config)
+            self.tb.pg_setcmd(0, self.tb.PG_CAL  + 101 + 5)
+            self.tb.pg_setcmd(1, self.tb.PG_TRG  + 16)
+            self.tb.pg_setcmd(2, self.tb.PG_TOK + ttk);
+            self.tb.pg_setcmd(3, self.tb.PG_TRG  + 16)
+            self.tb.pg_setcmd(4, self.tb.PG_TOK + ttk);
+            #self.tb.pg_setcmd(0, self.tb.PG_TRG  + ttk)
+            #self.tb.pg_setcmd(1, self.tb.PG_TOK)
         
 
