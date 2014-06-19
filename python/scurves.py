@@ -19,7 +19,7 @@ class SCurves(test.Test):
     def dump_to_file(self):
         for roc in self.dut.rocs():
             outfile = open('%s/SCurveData_C%s.dat' %(self.directory, roc.number), 'w')
-            outfile.write("Mode 1\n")
+            outfile.write("Mode 1\tNtrig %s\n"%self.n_triggers)
             for pixel in roc.pixels():
                 rough_thr = self.dut_thr_map[roc.number][pixel.col][pixel.row]
                 min_range = max(self.min_thr_dac, rough_thr-self.scan_range/2)
